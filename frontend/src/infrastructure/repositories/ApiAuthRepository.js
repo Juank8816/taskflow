@@ -2,16 +2,14 @@ import { request } from '../api/httpClient.js';
 
 export class ApiAuthRepository {
   async login(credentials) {
-    const result = await request('/auth/login', { method: 'POST', body: JSON.stringify(credentials) });
+    const result = await request('/api/auth/login', { method: 'POST', body: JSON.stringify(credentials) });
     this.saveSession(result);
     return result?.user || result;
   }
 
   async register(data) {
-    const result = await request('/auth/register', { method: 'POST', body: JSON.stringify(data) });
+    const result = await request('/api/auth/register', { method: 'POST', body: JSON.stringify(data) });
     
-    // Si el backend devuelve un token al registrarse, guardamos la sesión.
-    // Si solo devuelve un mensaje, evitamos que rompa la aplicación.
     if (result && result.token) {
       this.saveSession(result);
     }
@@ -20,7 +18,7 @@ export class ApiAuthRepository {
   }
 
   async me() { 
-    return request('/auth/me'); 
+    return request('/api/auth/me'); 
   }
 
   saveSession(result) {
