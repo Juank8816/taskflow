@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/taskflow/',
+  base: './', // <- Agrega esta línea para que las rutas relativas carguen los scripts correctamente
 })
