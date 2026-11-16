@@ -1,20 +1,38 @@
 import { request } from '../api/httpClient.js';
+
 export class ApiAuthRepository {
   async login(credentials) {
     const result = await request('/auth/login', { method: 'POST', body: JSON.stringify(credentials) });
     this.saveSession(result);
-    return result.user;
+    return result?.user || result;
   }
+
   async register(data) {
     const result = await request('/auth/register', { method: 'POST', body: JSON.stringify(data) });
-    this.saveSession(result);
-    return result.user;
+    
+    // Si el backend devuelve un token al registrarse, guardamos la sesión.
+    // Si solo devuelve un mensaje, evitamos que rompa la aplicación.
+    if (result && result.token) {
+      this.saveSession(result);
+    }
+    
+    return result?.user || result;
   }
-  async me() { return request('/auth/me'); }
+
+  async me() { 
+    return request('/auth/me'); 
+  }
+
   saveSession(result) {
-    localStorage.setItem('taskflow_token', result.token);
-    localStorage.setItem('taskflow_user', JSON.stringify(result.user));
+    if (!result) return;
+    if (result.token) {
+      localStorage.setItem('taskflow_token', result.token);
+    }
+    if (result.user) {
+      localStorage.setItem('taskflow_user', JSON.stringify(result.user));
+    }
   }
+
   logout() {
     localStorage.removeItem('taskflow_token');
     localStorage.removeItem('taskflow_user');
