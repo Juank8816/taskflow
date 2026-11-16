@@ -1,15 +1,19 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-export async function request(path, options = {}) {
-  const token = localStorage.getItem('taskflow_token');
-  const response = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers
+// Usa la variable de entorno de Render o recae en localhost para desarrollo local
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+export const httpClient = {
+  async request(endpoint, options = {}) {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  });
-  const data = response.status === 204 ? null : await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data?.message || 'No fue posible completar la solicitud.');
-  return data;
-}
+    return response.json();
+  }
+};
