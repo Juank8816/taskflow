@@ -12,5 +12,8 @@ export async function request(endpoint, options = {}) {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
-  return response.json();
+
+  // Leer como texto primero para evitar que falle si la respuesta está vacía
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
 }
